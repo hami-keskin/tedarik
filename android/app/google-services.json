@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "169208103190",
-    "project_id": "tedarik-c2cd3",
-    "storage_bucket": "tedarik-c2cd3.appspot.com"
+    "project_number": "136111455235",
+    "project_id": "tedarik-1e527",
+    "storage_bucket": "tedarik-1e527.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:169208103190:android:525f8e603b81966ce71037",
+        "mobilesdk_app_id": "1:136111455235:android:d3afb0d431d90dbb3ce236",
         "android_client_info": {
           "package_name": "com.mobilfinal.tedarik"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBexWoA3HG1SF-Tosj_UqBidKpsHO98lUg"
+          "current_key": "AIzaSyCWK8OqxtGfKUgtA4QW6obbtpVSlGGEZ_I"
         }
       ],
       "services": {
