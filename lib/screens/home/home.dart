@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:tedarik/ViewSuppliesPage.dart';
+import 'package:tedarik/ManageSuppliesPage.dart'; // Add the import for ManageSuppliesPage
 
 import '../../services/Auth.dart';
-import '../../CreateSupply.dart';
+import '../../CreateSupplyPage.dart';
 import '../../ViewSuppliesPage.dart';
 
 class Home extends StatefulWidget {
@@ -35,6 +36,17 @@ class _Home extends State<Home> {
                 );
               },
               child: Text('Tedariğini Oluştur'),
+            ),
+            SizedBox(height: 16),
+            // ManageSupplies sayfasını açan buton
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ManageSuppliesPage()),
+                );
+              },
+              child: Text('Tedarik Yönetimi'),
             ),
             SizedBox(height: 16),
             // ViewFilesPage sayfasını açan buton (geçici olarak disabled)

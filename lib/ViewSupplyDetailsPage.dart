@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
-import 'CreateSupply.dart';
+import 'CreateSupplyPage.dart';
 
 class ViewSupplyDetailsPage extends StatelessWidget {
   final Supply supply;

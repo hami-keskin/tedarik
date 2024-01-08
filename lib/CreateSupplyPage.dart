@@ -5,7 +5,9 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 
 class CreateSupplyPage extends StatefulWidget {
-  const CreateSupplyPage({Key? key}) : super(key: key);
+  const CreateSupplyPage({Key? key, this.supply}) : super(key: key);
+
+  final Supply? supply;
 
   @override
   State<CreateSupplyPage> createState() => _CreateSupplyPageState();
