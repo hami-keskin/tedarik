@@ -111,6 +111,9 @@ class Supply {
   List<File> files;
   String sharedBy;
   List<SupplyApplication> applications;
+  String? id; // New property
+
+  String? get getId => id; // New getter
 
   Supply({
     required this.title,
@@ -119,6 +122,7 @@ class Supply {
     this.files = const [],
     required this.sharedBy,
     this.applications = const [],
+    this.id, // Initialize the new property in the constructor
   });
 
   Map<String, dynamic> toMap() {
@@ -139,6 +143,7 @@ class Supply {
     }
 
     return Supply(
+      id: map['id'],
       title: map['title'] ?? '',
       description: map['description'] ?? '',
       industry: map['industry'] ?? '',
@@ -147,9 +152,7 @@ class Supply {
       applications: (map['applications'] as List<dynamic>? ?? []).map((appMap) => SupplyApplication.fromMap(appMap)).toList(),
     );
   }
-
 }
-
 
 class SupplyApplication {
   String applicantId;

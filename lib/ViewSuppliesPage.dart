@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import 'CreateSupply.dart';
+import 'ViewSupplyDetailsPage.dart';
 
 class ViewSuppliesPage extends StatefulWidget {
   const ViewSuppliesPage({Key? key}) : super(key: key);
@@ -31,7 +32,9 @@ class _ViewSuppliesPageState extends State<ViewSuppliesPage> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final supplies = snapshot.data!.docs.map((doc) => Supply.fromMap(doc.data() as Map<String, dynamic>?)).toList();
+          final supplies = snapshot.data!.docs
+              .map((doc) => Supply.fromMap(doc.data() as Map<String, dynamic>?))
+              .toList();
 
           return ListView.builder(
             itemCount: supplies.length,
@@ -43,8 +46,12 @@ class _ViewSuppliesPageState extends State<ViewSuppliesPage> {
                   subtitle: Text(supply.industry),
                   trailing: const Icon(Icons.arrow_forward_ios),
                   onTap: () {
-                    // Tedarik ayrıntılarını görüntülemek için sayfaya yönlendir
-                    Navigator.pushNamed(context, '/view_supply_details', arguments: supply);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ViewSupplyDetailsPage(supply: supply),
+                      ),
+                    );
                   },
                 ),
               );
