@@ -21,6 +21,19 @@ class _CreateSupplyPageState extends State<CreateSupplyPage> {
   List<File> files = [];
 
   @override
+  void initState() {
+    super.initState();
+
+    // Düzenleme için var olan verileri kullanın
+    if (widget.supply != null) {
+      titleController.text = widget.supply!.title;
+      descriptionController.text = widget.supply!.description;
+      industryController.text = widget.supply!.industry;
+      files = widget.supply!.files;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -69,35 +82,37 @@ class _CreateSupplyPageState extends State<CreateSupplyPage> {
                 },
                 child: const Text('Dosya Ekle'),
               ),
-          ElevatedButton(
-            onPressed: () async {
-              // Kullanıcının ID'sini al
-              final userId = FirebaseAuth.instance.currentUser!.uid;
+              ElevatedButton(
+                onPressed: () async {
+                  if (_formKey.currentState!.validate()) {
+                    // Kullanıcının ID'sini al
+                    final userId = FirebaseAuth.instance.currentUser!.uid;
 
-              // Tedarik bilgilerini oluştur
-              final supply = Supply(
-                title: titleController.text,
-                description: descriptionController.text,
-                industry: industryController.text,
-                files: files,
-                sharedBy: userId,
-              );
+                    // Tedarik bilgilerini oluştur
+                    final supply = Supply(
+                      title: titleController.text,
+                      description: descriptionController.text,
+                      industry: industryController.text,
+                      files: files,
+                      sharedBy: userId,
+                    );
 
-              // Tedarik bilgilerini Cloud Firestore'a ekle
-              await FirebaseFirestore.instance.collection('supplies').add(supply.toMap());
+                    // Tedarik bilgilerini Cloud Firestore'a ekle
+                    await FirebaseFirestore.instance.collection('supplies').add(supply.toMap());
 
-              // Kullanıcıya geri bildirim göster
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Tedariğiniz başarıyla paylaşıldı.'),
-                ),
-              );
+                    // Kullanıcıya geri bildirim göster
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Tedariğiniz başarıyla paylaşıldı.'),
+                      ),
+                    );
 
-              // Sayfadan çık
-              Navigator.pop(context);
-            },
-            child: const Text('Tedariğini Paylaş'),
-          ),
+                    // Sayfadan çık
+                    Navigator.pop(context);
+                  }
+                },
+                child: const Text('Tedariğini Paylaş'),
+              ),
             ],
           ),
         ),
