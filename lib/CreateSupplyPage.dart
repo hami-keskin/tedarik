@@ -23,8 +23,6 @@ class _CreateSupplyPageState extends State<CreateSupplyPage> {
   @override
   void initState() {
     super.initState();
-
-    // Düzenleme için var olan verileri kullanın
     if (widget.supply != null) {
       titleController.text = widget.supply!.title;
       descriptionController.text = widget.supply!.description;
@@ -47,37 +45,23 @@ class _CreateSupplyPageState extends State<CreateSupplyPage> {
             children: [
               TextFormField(
                 controller: titleController,
-                decoration: const InputDecoration(
-                  labelText: 'Tedariğin Başlığı',
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Başlık gereklidir.';
-                  }
-                  return null;
-                },
+                decoration: const InputDecoration(labelText: 'Tedariğin Başlığı'),
+                validator: (value) => value?.isEmpty ?? true ? 'Başlık gereklidir.' : null,
               ),
               TextFormField(
                 controller: descriptionController,
-                decoration: const InputDecoration(
-                  labelText: 'Tedariğin Açıklaması',
-                ),
+                decoration: const InputDecoration(labelText: 'Tedariğin Açıklaması'),
                 maxLines: 5,
               ),
               TextFormField(
                 controller: industryController,
-                decoration: const InputDecoration(
-                  labelText: 'Tedariğin Sektörü',
-                ),
+                decoration: const InputDecoration(labelText: 'Tedariğin Sektörü'),
               ),
               ElevatedButton(
                 onPressed: () async {
-                  final picker = ImagePicker();
-                  final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+                  final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
                   if (pickedFile != null) {
-                    setState(() {
-                      files.add(File(pickedFile.path));
-                    });
+                    setState(() => files.add(File(pickedFile.path)));
                   }
                 },
                 child: const Text('Dosya Ekle'),
@@ -85,10 +69,7 @@ class _CreateSupplyPageState extends State<CreateSupplyPage> {
               ElevatedButton(
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    // Kullanıcının ID'sini al
                     final userId = FirebaseAuth.instance.currentUser!.uid;
-
-                    // Tedarik bilgilerini oluştur
                     final supply = Supply(
                       title: titleController.text,
                       description: descriptionController.text,
@@ -97,17 +78,13 @@ class _CreateSupplyPageState extends State<CreateSupplyPage> {
                       sharedBy: userId,
                     );
 
-                    // Tedarik bilgilerini Cloud Firestore'a ekle
-                    await FirebaseFirestore.instance.collection('supplies').add(supply.toMap());
+                    final docRef = await FirebaseFirestore.instance.collection('supplies').add(supply.toMap());
+                    supply.id = docRef.id;
 
-                    // Kullanıcıya geri bildirim göster
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Tedariğiniz başarıyla paylaşıldı.'),
-                      ),
+                      SnackBar(content: Text('Tedariğiniz başarıyla paylaşıldı.')),
                     );
 
-                    // Sayfadan çık
                     Navigator.pop(context);
                   }
                 },
@@ -128,9 +105,9 @@ class Supply {
   List<File> files;
   String sharedBy;
   List<SupplyApplication> applications;
-  String? id; // New property
+  String? id;
 
-  String? get getId => id; // New getter
+  String? get getId => id;
 
   Supply({
     required this.title,
@@ -139,7 +116,7 @@ class Supply {
     this.files = const [],
     required this.sharedBy,
     this.applications = const [],
-    this.id, // Initialize the new property in the constructor
+    this.id,
   });
 
   Map<String, dynamic> toMap() {
@@ -155,7 +132,6 @@ class Supply {
 
   factory Supply.fromMap(Map<String, dynamic>? map) {
     if (map == null) {
-      // Handle the case where the map is null
       throw ArgumentError('map cannot be null');
     }
 
