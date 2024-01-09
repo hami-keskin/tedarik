@@ -70,16 +70,30 @@ class _CreateSupplyPageState extends State<CreateSupplyPage> {
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
                     final userId = FirebaseAuth.instance.currentUser!.uid;
-                    final supply = Supply(
-                      title: titleController.text,
-                      description: descriptionController.text,
-                      industry: industryController.text,
-                      files: files,
-                      sharedBy: userId,
-                    );
 
-                    final docRef = await FirebaseFirestore.instance.collection('supplies').add(supply.toMap());
-                    supply.id = docRef.id;
+                    if (widget.supply != null) {
+                      // If supply is not null, update the existing supply
+                      await FirebaseFirestore.instance.collection('supplies').doc(widget.supply!.getId).update(
+                        {
+                          'title': titleController.text,
+                          'description': descriptionController.text,
+                          'industry': industryController.text,
+                          'files': files.map((file) => file.path).toList(),
+                        },
+                      );
+                    } else {
+                      // If supply is null, create a new supply
+                      final supply = Supply(
+                        title: titleController.text,
+                        description: descriptionController.text,
+                        industry: industryController.text,
+                        files: files,
+                        sharedBy: userId,
+                      );
+
+                      final docRef = await FirebaseFirestore.instance.collection('supplies').add(supply.toMap());
+                      supply.id = docRef.id;
+                    }
 
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Tedariğiniz başarıyla paylaşıldı.')),
@@ -97,6 +111,7 @@ class _CreateSupplyPageState extends State<CreateSupplyPage> {
     );
   }
 }
+
 
 class Supply {
   String title;
