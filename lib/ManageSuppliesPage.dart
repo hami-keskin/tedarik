@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'CreateSupplyPage.dart';
+import 'ViewSupplyDetailsPage.dart';
 
 class ManageSuppliesPage extends StatefulWidget {
   const ManageSuppliesPage({Key? key}) : super(key: key);
@@ -46,6 +47,15 @@ class _ManageSuppliesPageState extends State<ManageSuppliesPage> {
                 child: ListTile(
                   title: Text(supply.title),
                   subtitle: Text(supply.industry),
+                  onTap: () {
+                    // Burada ViewSupplyDetailsPage sayfasını açabilirsiniz
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ViewSupplyDetailsPage(supply: supply),
+                      ),
+                    );
+                  },
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
