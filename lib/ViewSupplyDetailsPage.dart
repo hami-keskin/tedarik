@@ -5,10 +5,23 @@ import 'package:flutter/material.dart';
 
 import 'CreateSupplyPage.dart';
 
-class ViewSupplyDetailsPage extends StatelessWidget {
+class ViewSupplyDetailsPage extends StatefulWidget {
   final Supply supply;
 
   const ViewSupplyDetailsPage({Key? key, required this.supply}) : super(key: key);
+
+  @override
+  _ViewSupplyDetailsPageState createState() => _ViewSupplyDetailsPageState();
+}
+
+class _ViewSupplyDetailsPageState extends State<ViewSupplyDetailsPage> {
+  late Supply supply;
+
+  @override
+  void initState() {
+    super.initState();
+    supply = widget.supply;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -138,9 +151,20 @@ class ViewSupplyDetailsPage extends StatelessWidget {
       final application = SupplyApplication(applicantId: userId, supplyId: supply.getId!, status: 'pending');
 
       try {
+        // Update the applications list in Firestore
         await FirebaseFirestore.instance.collection('supplies').doc(supply.getId).update({
           'applications': FieldValue.arrayUnion([application.toMap()])
         });
+
+        // Retrieve the updated supply with applications
+        final updatedSupply = await FirebaseFirestore.instance.collection('supplies').doc(supply.getId).get();
+        final updatedSupplyObject = Supply.fromMap(updatedSupply.data() as Map<String, dynamic>);
+
+        // Update the local supply object
+        setState(() {
+          supply.applications = updatedSupplyObject.applications;
+        });
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Başvurunuz başarıyla gönderildi.')),
         );
@@ -158,4 +182,5 @@ class ViewSupplyDetailsPage extends StatelessWidget {
       );
     }
   }
+
 }

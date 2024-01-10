@@ -154,6 +154,17 @@ class Supply {
       'applications': applications.map((application) => application.toMap()).toList(),
     };
   }
+  Map<String, dynamic> toMapWithApplications() {
+    return {
+      'title': title,
+      'description': description,
+      'industry': industry,
+      'files': files.map((file) => file.path).toList(),
+      'sharedBy': sharedBy,
+      'applications': applications.map((application) => application.toMap()).toList(),
+    };
+  }
+
 
   factory Supply.fromMap(Map<String, dynamic>? map) {
     if (map == null) {
