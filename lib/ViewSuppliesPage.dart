@@ -12,17 +12,38 @@ class ViewSuppliesPage extends StatefulWidget {
 }
 
 class _ViewSuppliesPageState extends State<ViewSuppliesPage> {
-  final Stream<QuerySnapshot> _suppliesStream =
-  FirebaseFirestore.instance.collection('supplies').snapshots();
+  late TextEditingController _searchController;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tedarik Listesi'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            onPressed: () async {
+              final String? result = await showSearch<String>(
+                context: context,
+                delegate: _SupplySearchDelegate(),
+              );
+
+              if (result != null && result.isNotEmpty) {
+                // Handle the search result if needed
+                // For example, you can navigate to the details page of the found supply
+              }
+            },
+          ),
+        ],
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: _suppliesStream,
+        stream: FirebaseFirestore.instance.collection('supplies').snapshots(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return const Center(child: Text('Bir hata oluştu'));
@@ -59,6 +80,79 @@ class _ViewSuppliesPageState extends State<ViewSuppliesPage> {
           );
         },
       ),
+    );
+  }
+}
+
+class _SupplySearchDelegate extends SearchDelegate<String> {
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return [
+      IconButton(
+        icon: const Icon(Icons.clear),
+        onPressed: () {
+          query = '';
+        },
+      ),
+    ];
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () {
+        close(context, '');
+      },
+    );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    return _buildSearchResults(context);
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    return _buildSearchResults(context);
+  }
+
+  Widget _buildSearchResults(BuildContext context) {
+    final Stream<QuerySnapshot> searchStream = FirebaseFirestore.instance
+        .collection('supplies')
+        .where('title', isGreaterThanOrEqualTo: query)
+        .where('title', isLessThan: query + 'z')
+        .snapshots();
+
+    return StreamBuilder<QuerySnapshot>(
+      stream: searchStream,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return const Center(child: Text('Bir hata oluştu'));
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final supplies = snapshot.data!.docs
+            .map((doc) => Supply.fromMap(doc.data() as Map<String, dynamic>?))
+            .toList();
+
+        return ListView.builder(
+          itemCount: supplies.length,
+          itemBuilder: (context, index) {
+            final supply = supplies[index];
+            return ListTile(
+              title: Text(supply.title),
+              subtitle: Text(supply.industry),
+              onTap: () {
+                close(context, supply.title);
+              },
+            );
+          },
+        );
+      },
     );
   }
 }
