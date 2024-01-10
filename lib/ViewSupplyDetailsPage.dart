@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 
 import 'CreateSupplyPage.dart';
@@ -26,13 +25,11 @@ class ViewSupplyDetailsPage extends StatelessWidget {
             _buildInfoRow('Paylaşan:', supply.sharedBy),
             if (supply.files.isNotEmpty) ...[
               const SizedBox(height: 16.0),
-              Text('Dosyalar:', style: TextStyle(fontWeight: FontWeight.bold)),
-              _buildFilesList(supply.files),
+              _buildSection('Dosyalar:', _buildFilesList(supply.files)),
             ],
             if (supply.applications.isNotEmpty) ...[
               const SizedBox(height: 16.0),
-              Text('Başvurular:', style: TextStyle(fontWeight: FontWeight.bold)),
-              _buildApplicationsList(supply.applications),
+              _buildSection('Başvurular:', _buildApplicationsList(supply.applications)),
             ],
           ],
         ),
@@ -56,6 +53,16 @@ class ViewSupplyDetailsPage extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildSection(String title, Widget content) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
+        content,
+      ],
     );
   }
 
