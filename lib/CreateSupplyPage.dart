@@ -92,7 +92,12 @@ class _CreateSupplyPageState extends State<CreateSupplyPage> {
                       );
 
                       final docRef = await FirebaseFirestore.instance.collection('supplies').add(supply.toMap());
-                      supply.id = docRef.id;
+
+// Set the ID after adding the document to Firestore
+                      supply.setId(docRef.id);
+
+// Add the ID to the map before writing to Firestore
+                      await docRef.update({'id': supply.getId});
                     }
 
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -134,6 +139,11 @@ class Supply {
     this.id,
   });
 
+  // Add a method to set the ID
+  void setId(String id) {
+    this.id = id;
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'title': title,
@@ -161,6 +171,7 @@ class Supply {
     );
   }
 }
+
 
 class SupplyApplication {
   String applicantId;

@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import 'CreateSupplyPage.dart';
@@ -31,6 +33,12 @@ class ViewSupplyDetailsPage extends StatelessWidget {
               const SizedBox(height: 16.0),
               _buildSection('Başvurular:', _buildApplicationsList(supply.applications)),
             ],
+            ElevatedButton(
+              onPressed: () {
+                _showApplyDialog(context);
+              },
+              child: const Text('Tedariğe Başvur'),
+            ),
           ],
         ),
       ),
@@ -93,5 +101,61 @@ class ViewSupplyDetailsPage extends StatelessWidget {
         );
       },
     );
+  }
+
+  void _showApplyDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Tedariğe Başvur'),
+          content: const Text('Bu tedariğe başvuruda bulunmak istiyor musunuz?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('İptal'),
+            ),
+            TextButton(
+              onPressed: () async {
+                await _applyToSupply(context);
+              },
+              child: const Text('Başvur'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _applyToSupply(BuildContext context) async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+
+    // Debug print to check the value of supply.getId
+    print('Supply ID: ${supply.getId}');
+
+    // Check if supply.getId is not null before using it
+    if (supply.getId != null) {
+      final application = SupplyApplication(applicantId: userId, supplyId: supply.getId!, status: 'pending');
+
+      try {
+        await FirebaseFirestore.instance.collection('supplies').doc(supply.getId).update({
+          'applications': FieldValue.arrayUnion([application.toMap()])
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Başvurunuz başarıyla gönderildi.')),
+        );
+        Navigator.pop(context);
+      } catch (error) {
+        // Handle any errors that may occur during the application process
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Başvuru sırasında bir hata oluştu: ${error.toString()}')),
+        );
+      }
+    } else {
+      // Handle the case where supply.getId is null
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Başvuruda bir hata oluştu: Tedariğin ID bilgisi bulunamadı.')),
+      );
+    }
   }
 }
