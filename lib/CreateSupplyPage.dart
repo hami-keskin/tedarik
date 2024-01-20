@@ -39,111 +39,119 @@ class _CreateSupplyPageState extends State<CreateSupplyPage> {
         title: const Text('Tedariğini Oluştur'),
         backgroundColor: Theme.of(context).primaryColorLight,
       ),
-      body: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                TextFormField(
-                  controller: titleController,
-                  decoration: const InputDecoration(labelText: 'Tedariğin Başlığı'),
-                  validator: (value) => value?.isEmpty ?? true ? 'Başlık gereklidir.' : null,
-                ),
-                SizedBox(height: 10),
-
-                TextFormField(
-                  controller: descriptionController,
-                  decoration: const InputDecoration(labelText: 'Tedariğin Açıklaması'),
-                  maxLines: 5,
-                ),
-                SizedBox(height: 10),
-
-                TextFormField(
-                  controller: industryController,
-                  decoration: const InputDecoration(labelText: 'Tedariğin Sektörü'),
-                ),
-                SizedBox(height: 30),
-                Container(
-                  height: 64, // Adjust the height as needed
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
-                      if (pickedFile != null) {
-                        setState(() => files.add(File(pickedFile.path)));
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.all(16.0),
-                      fixedSize: Size(MediaQuery.of(context).size.width / 2, 0),
-                      minimumSize: Size(MediaQuery.of(context).size.width / 2, 64),
-                      textStyle: TextStyle(color: Colors.black),
+      body: SafeArea(
+        child: Container(
+          height: MediaQuery.of(context).size.height,
+          child: SingleChildScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            child: Form(
+              key: _formKey,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    TextFormField(
+                      controller: titleController,
+                      decoration: const InputDecoration(labelText: 'Tedariğin Başlığı'),
+                      validator: (value) => value?.isEmpty ?? true ? 'Başlık gereklidir.' : null,
                     ),
-                    child: Text(
-                      'Dosya Ekle',
-                      style: TextStyle(color: Colors.black),
+                    SizedBox(height: 8), // Reduced from 10 to 8
+
+                    TextFormField(
+                      controller: descriptionController,
+                      decoration: const InputDecoration(labelText: 'Tedariğin Açıklaması'),
+                      maxLines: 5,
                     ),
-                  ),
+                    SizedBox(height: 8), // Reduced from 10 to 8
+
+                    TextFormField(
+                      controller: industryController,
+                      decoration: const InputDecoration(labelText: 'Tedariğin Sektörü'),
+                    ),
+                    SizedBox(height: 16), // Reduced from 30 to 16
+
+                    Container(
+                      height: 56, // Reduced from 64 to 56
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+                          if (pickedFile != null) {
+                            setState(() => files.add(File(pickedFile.path)));
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.all(16.0),
+                          fixedSize: Size(MediaQuery.of(context).size.width / 2, 0),
+                          minimumSize: Size(MediaQuery.of(context).size.width / 2, 56), // Reduced from 64 to 56
+                          textStyle: TextStyle(color: Colors.black),
+                        ),
+                        child: Text(
+                          'Dosya Ekle',
+                          style: TextStyle(color: Colors.black),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 12), // Reduced from 20 to 12
+
+                    Container(
+                      height: 56, // Reduced from 64 to 56
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
+                            final userId = FirebaseAuth.instance.currentUser!.uid;
+
+                            if (widget.supply != null) {
+                              await FirebaseFirestore.instance.collection('supplies').doc(widget.supply!.getId).update(
+                                {
+                                  'title': titleController.text,
+                                  'description': descriptionController.text,
+                                  'industry': industryController.text,
+                                  'files': files.map((file) => file.path).toList(),
+                                },
+                              );
+                            } else {
+                              final supply = Supply(
+                                title: titleController.text,
+                                description: descriptionController.text,
+                                industry: industryController.text,
+                                files: files,
+                                sharedBy: userId,
+                              );
+
+                              final docRef = await FirebaseFirestore.instance.collection('supplies').add(supply.toMap());
+
+                              supply.setId(docRef.id);
+
+                              await docRef.update({'id': supply.getId});
+                            }
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Tedariğiniz başarıyla paylaşıldı.')),
+                            );
+
+                            Navigator.pop(context);
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.all(16.0),
+                          fixedSize: Size(MediaQuery.of(context).size.width / 2, 0),
+                          minimumSize: Size(MediaQuery.of(context).size.width / 2, 56), // Reduced from 64 to 56
+                          textStyle: TextStyle(color: Colors.black),
+                        ),
+                        child: Text(
+                          'Tedariğini Paylaş',
+                          style: TextStyle(color: Colors.black),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 20),
-                Container(
-                  height: 64, // Adjust the height as needed
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      if (_formKey.currentState!.validate()) {
-                        final userId = FirebaseAuth.instance.currentUser!.uid;
-
-                        if (widget.supply != null) {
-                          await FirebaseFirestore.instance.collection('supplies').doc(widget.supply!.getId).update(
-                            {
-                              'title': titleController.text,
-                              'description': descriptionController.text,
-                              'industry': industryController.text,
-                              'files': files.map((file) => file.path).toList(),
-                            },
-                          );
-                        } else {
-                          final supply = Supply(
-                            title: titleController.text,
-                            description: descriptionController.text,
-                            industry: industryController.text,
-                            files: files,
-                            sharedBy: userId,
-                          );
-
-                          final docRef = await FirebaseFirestore.instance.collection('supplies').add(supply.toMap());
-
-                          supply.setId(docRef.id);
-
-                          await docRef.update({'id': supply.getId});
-                        }
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Tedariğiniz başarıyla paylaşıldı.')),
-                        );
-
-                        Navigator.pop(context);
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      padding: EdgeInsets.all(16.0),
-                      fixedSize: Size(MediaQuery.of(context).size.width / 2, 0),
-                      minimumSize: Size(MediaQuery.of(context).size.width / 2, 64),
-                      textStyle: TextStyle(color: Colors.black),
-                    ),
-                    child: Text(
-                      'Tedariğini Paylaş',
-                      style: TextStyle(color: Colors.black),
-                    ),
-                  ),
-                ),
-              ],
+              ),
             ),
           ),
         ),
       ),
-    );
+    ); // Closing parenthesis added here
   }
 }
 
