@@ -148,7 +148,13 @@ class _SupplySearchDelegate extends SearchDelegate<String> {
               title: Text(supply.title),
               subtitle: Text(supply.industry),
               onTap: () {
-                close(context, supply.title);
+                // Navigate to the detail page when a search result is tapped
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ViewSupplyDetailsPage(supply: supply),
+                  ),
+                );
               },
             );
           },
