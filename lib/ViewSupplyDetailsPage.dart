@@ -16,11 +16,25 @@ class ViewSupplyDetailsPage extends StatefulWidget {
 
 class _ViewSupplyDetailsPageState extends State<ViewSupplyDetailsPage> {
   late Supply supply;
+  bool hasApplied = false; // Add this line
 
   @override
   void initState() {
     super.initState();
     supply = widget.supply;
+    _checkApplicationStatus(); // Add this line to check the application status
+  }
+
+  // Function to check if the user has already applied
+  void _checkApplicationStatus() async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
+
+    // Check if the user has an application for this supply
+    if (supply.applications.any((app) => app.applicantId == userId)) {
+      setState(() {
+        hasApplied = true;
+      });
+    }
   }
 
   @override
@@ -46,13 +60,15 @@ class _ViewSupplyDetailsPageState extends State<ViewSupplyDetailsPage> {
               const SizedBox(height: 16.0),
               _buildSection('Başvurular:', _buildApplicationsList(supply.applications)),
             ],
-            ElevatedButton(
-              onPressed: () {
-                _showApplyDialog(context);
-              },
-              child: const Text('Tedariğe Başvur'),
-            ),
-            if (supply.applications.any((app) => app.applicantId == FirebaseAuth.instance.currentUser!.uid)) ...[
+            if (!hasApplied) ...[ // Show the button only if the user hasn't applied
+              ElevatedButton(
+                onPressed: () {
+                  _showApplyDialog(context);
+                },
+                child: const Text('Tedariğe Başvur'),
+              ),
+            ],
+            if (hasApplied) ...[ // Show the "Başvuruyu Geri Çek" button only if the user has applied
               const SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: () {
@@ -98,7 +114,7 @@ class _ViewSupplyDetailsPageState extends State<ViewSupplyDetailsPage> {
 
   Widget _buildFilesList(List<File> files) {
     return ListView.builder(
-      shrinkWrap: true,
+      shrinkWrap: true, // Add this line
       itemCount: files.length,
       itemBuilder: (context, index) {
         final file = files[index];
@@ -112,7 +128,7 @@ class _ViewSupplyDetailsPageState extends State<ViewSupplyDetailsPage> {
 
   Widget _buildApplicationsList(List<SupplyApplication> applications) {
     return ListView.builder(
-      shrinkWrap: true,
+      shrinkWrap: true, // Add this line
       itemCount: applications.length,
       itemBuilder: (context, index) {
         final application = applications[index];
