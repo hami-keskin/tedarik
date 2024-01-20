@@ -34,8 +34,10 @@ class _CreateSupplyPageState extends State<CreateSupplyPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).primaryColorLight,
       appBar: AppBar(
         title: const Text('Tedariğini Oluştur'),
+        backgroundColor: Theme.of(context).primaryColorLight,
       ),
       body: Form(
         key: _formKey,
@@ -48,15 +50,20 @@ class _CreateSupplyPageState extends State<CreateSupplyPage> {
                 decoration: const InputDecoration(labelText: 'Tedariğin Başlığı'),
                 validator: (value) => value?.isEmpty ?? true ? 'Başlık gereklidir.' : null,
               ),
+              SizedBox(height: 10),
+
               TextFormField(
                 controller: descriptionController,
                 decoration: const InputDecoration(labelText: 'Tedariğin Açıklaması'),
                 maxLines: 5,
               ),
+              SizedBox(height: 10),
+
               TextFormField(
                 controller: industryController,
                 decoration: const InputDecoration(labelText: 'Tedariğin Sektörü'),
               ),
+              SizedBox(height: 30),
               ElevatedButton(
                 onPressed: () async {
                   final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -64,8 +71,18 @@ class _CreateSupplyPageState extends State<CreateSupplyPage> {
                     setState(() => files.add(File(pickedFile.path)));
                   }
                 },
-                child: const Text('Dosya Ekle'),
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.all(16.0),
+                  fixedSize: Size(MediaQuery.of(context).size.width / 2, 0), // Genişliği ekranın yarısı kadar yap
+                  minimumSize: Size(MediaQuery.of(context).size.width / 2, 64), // Yüksekliği iki katına çıkar
+                  textStyle: TextStyle(color: Colors.black),
+                ),
+                child: Text(
+                  'Dosya Ekle',
+                  style: TextStyle(color: Colors.black),
+                ),
               ),
+              SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () async {
                   if (_formKey.currentState!.validate()) {
@@ -107,7 +124,16 @@ class _CreateSupplyPageState extends State<CreateSupplyPage> {
                     Navigator.pop(context);
                   }
                 },
-                child: const Text('Tedariğini Paylaş'),
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.all(16.0),
+                  fixedSize: Size(MediaQuery.of(context).size.width / 2, 0), // Genişliği ekranın yarısı kadar yap
+                  minimumSize: Size(MediaQuery.of(context).size.width / 2, 64), // Yüksekliği iki katına çıkar
+                  textStyle: TextStyle(color: Colors.black),
+                ),
+                child: Text(
+                  'Tedariğini Paylaş',
+                  style: TextStyle(color: Colors.black),
+                ),
               ),
             ],
           ),
