@@ -21,6 +21,7 @@ class _ManageSuppliesPageState extends State<ManageSuppliesPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Tedarik Yönetimi'),
+        backgroundColor: Theme.of(context).primaryColorLight,
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: _suppliesStream,

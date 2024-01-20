@@ -33,7 +33,7 @@ class _Home extends State<Home> {
             padding: EdgeInsets.all(16.0),
             alignment: Alignment.center,
             child: Image(
-              image: AssetImage("images/logo.PNG"),
+              image: AssetImage("lib/images/logo.PNG"),
               width: 300,
               height: 150,
             ),

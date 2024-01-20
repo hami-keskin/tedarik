@@ -24,6 +24,7 @@ class _ViewSuppliesPageState extends State<ViewSuppliesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Theme.of(context).primaryColorLight,
         title: const Text('Tedarik Listesi'),
         actions: [
           IconButton(
