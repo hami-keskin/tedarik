@@ -65,71 +65,77 @@ class _CreateSupplyPageState extends State<CreateSupplyPage> {
                   decoration: const InputDecoration(labelText: 'Tedariğin Sektörü'),
                 ),
                 SizedBox(height: 30),
-                ElevatedButton(
-                  onPressed: () async {
-                    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
-                    if (pickedFile != null) {
-                      setState(() => files.add(File(pickedFile.path)));
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.all(16.0),
-                    fixedSize: Size(MediaQuery.of(context).size.width / 2, 0),
-                    minimumSize: Size(MediaQuery.of(context).size.width / 2, 64),
-                    textStyle: TextStyle(color: Colors.black),
-                  ),
-                  child: Text(
-                    'Dosya Ekle',
-                    style: TextStyle(color: Colors.black),
+                Container(
+                  height: 64, // Adjust the height as needed
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+                      if (pickedFile != null) {
+                        setState(() => files.add(File(pickedFile.path)));
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.all(16.0),
+                      fixedSize: Size(MediaQuery.of(context).size.width / 2, 0),
+                      minimumSize: Size(MediaQuery.of(context).size.width / 2, 64),
+                      textStyle: TextStyle(color: Colors.black),
+                    ),
+                    child: Text(
+                      'Dosya Ekle',
+                      style: TextStyle(color: Colors.black),
+                    ),
                   ),
                 ),
                 SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      final userId = FirebaseAuth.instance.currentUser!.uid;
+                Container(
+                  height: 64, // Adjust the height as needed
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        final userId = FirebaseAuth.instance.currentUser!.uid;
 
-                      if (widget.supply != null) {
-                        await FirebaseFirestore.instance.collection('supplies').doc(widget.supply!.getId).update(
-                          {
-                            'title': titleController.text,
-                            'description': descriptionController.text,
-                            'industry': industryController.text,
-                            'files': files.map((file) => file.path).toList(),
-                          },
+                        if (widget.supply != null) {
+                          await FirebaseFirestore.instance.collection('supplies').doc(widget.supply!.getId).update(
+                            {
+                              'title': titleController.text,
+                              'description': descriptionController.text,
+                              'industry': industryController.text,
+                              'files': files.map((file) => file.path).toList(),
+                            },
+                          );
+                        } else {
+                          final supply = Supply(
+                            title: titleController.text,
+                            description: descriptionController.text,
+                            industry: industryController.text,
+                            files: files,
+                            sharedBy: userId,
+                          );
+
+                          final docRef = await FirebaseFirestore.instance.collection('supplies').add(supply.toMap());
+
+                          supply.setId(docRef.id);
+
+                          await docRef.update({'id': supply.getId});
+                        }
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Tedariğiniz başarıyla paylaşıldı.')),
                         );
-                      } else {
-                        final supply = Supply(
-                          title: titleController.text,
-                          description: descriptionController.text,
-                          industry: industryController.text,
-                          files: files,
-                          sharedBy: userId,
-                        );
 
-                        final docRef = await FirebaseFirestore.instance.collection('supplies').add(supply.toMap());
-
-                        supply.setId(docRef.id);
-
-                        await docRef.update({'id': supply.getId});
+                        Navigator.pop(context);
                       }
-
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Tedariğiniz başarıyla paylaşıldı.')),
-                      );
-
-                      Navigator.pop(context);
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.all(16.0),
-                    fixedSize: Size(MediaQuery.of(context).size.width / 2, 0),
-                    minimumSize: Size(MediaQuery.of(context).size.width / 2, 64),
-                    textStyle: TextStyle(color: Colors.black),
-                  ),
-                  child: Text(
-                    'Tedariğini Paylaş',
-                    style: TextStyle(color: Colors.black),
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.all(16.0),
+                      fixedSize: Size(MediaQuery.of(context).size.width / 2, 0),
+                      minimumSize: Size(MediaQuery.of(context).size.width / 2, 64),
+                      textStyle: TextStyle(color: Colors.black),
+                    ),
+                    child: Text(
+                      'Tedariğini Paylaş',
+                      style: TextStyle(color: Colors.black),
+                    ),
                   ),
                 ),
               ],

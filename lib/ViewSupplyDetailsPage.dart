@@ -52,6 +52,15 @@ class _ViewSupplyDetailsPageState extends State<ViewSupplyDetailsPage> {
               },
               child: const Text('Tedariğe Başvur'),
             ),
+            if (supply.applications.any((app) => app.applicantId == FirebaseAuth.instance.currentUser!.uid)) ...[
+              const SizedBox(height: 16.0),
+              ElevatedButton(
+                onPressed: () {
+                  _showWithdrawDialog(context);
+                },
+                child: const Text('Başvuruyu Geri Çek'),
+              ),
+            ],
           ],
         ),
       ),
@@ -140,6 +149,30 @@ class _ViewSupplyDetailsPageState extends State<ViewSupplyDetailsPage> {
     );
   }
 
+  void _showWithdrawDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Başvuruyu Geri Çek'),
+          content: const Text('Bu tedariğe yapmış olduğunuz başvuruyu geri çekmek istiyor musunuz?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('İptal'),
+            ),
+            TextButton(
+              onPressed: () async {
+                await _withdrawApplication(context);
+              },
+              child: const Text('Geri Çek'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> _applyToSupply(BuildContext context) async {
     final userId = FirebaseAuth.instance.currentUser!.uid;
 
@@ -182,5 +215,43 @@ class _ViewSupplyDetailsPageState extends State<ViewSupplyDetailsPage> {
       );
     }
   }
+  Future<void> _withdrawApplication(BuildContext context) async {
+    final userId = FirebaseAuth.instance.currentUser!.uid;
 
+    // Check if supply.getId is not null before using it
+    if (supply.getId != null) {
+      final application = SupplyApplication(applicantId: userId, supplyId: supply.getId!, status: 'pending');
+
+      try {
+        // Remove the user's application from the applications list in Firestore
+        await FirebaseFirestore.instance.collection('supplies').doc(supply.getId).update({
+          'applications': FieldValue.arrayRemove([application.toMap()])
+        });
+
+        // Retrieve the updated supply with applications
+        final updatedSupply = await FirebaseFirestore.instance.collection('supplies').doc(supply.getId).get();
+        final updatedSupplyObject = Supply.fromMap(updatedSupply.data() as Map<String, dynamic>);
+
+        // Update the local supply object
+        setState(() {
+          supply.applications = updatedSupplyObject.applications;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Başvurunuz başarıyla geri çekildi.')),
+        );
+        Navigator.pop(context);
+      } catch (error) {
+        // Handle any errors that may occur during the withdrawal process
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Başvuru geri çekme sırasında bir hata oluştu: ${error.toString()}')),
+        );
+      }
+    } else {
+      // Handle the case where supply.getId is null
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Başvuru geri çekmede bir hata oluştu: Tedariğin ID bilgisi bulunamadı.')),
+      );
+    }
+  }
 }
