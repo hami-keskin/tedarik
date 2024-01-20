@@ -27,7 +27,7 @@ class _Register extends State<Register>{
 
     final logo = Container( // buraya logo gelecek
       padding: const EdgeInsets.symmetric(vertical: 20),
-      child: const Image(image: AssetImage("lib/images/temp.PNG")),
+      child: const Image(image: AssetImage("lib/images/logo.PNG")),
     );
 
     final emailField = Container(

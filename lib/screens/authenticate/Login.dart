@@ -27,7 +27,7 @@ class _Login extends State<Login> {
 
     final logo = Container( // buraya logo gelecek
       padding: const EdgeInsets.symmetric(vertical: 20),
-      child: const Image(image: AssetImage("lib/images/temp.PNG")),
+      child: const Image(image: AssetImage("lib/images/logo.PNG")),
     );
 
     final emailField = Container(
