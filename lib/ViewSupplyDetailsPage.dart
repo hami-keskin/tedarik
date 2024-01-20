@@ -16,13 +16,13 @@ class ViewSupplyDetailsPage extends StatefulWidget {
 
 class _ViewSupplyDetailsPageState extends State<ViewSupplyDetailsPage> {
   late Supply supply;
-  bool hasApplied = false; // Add this line
+  bool hasApplied = false;
 
   @override
   void initState() {
     super.initState();
     supply = widget.supply;
-    _checkApplicationStatus(); // Add this line to check the application status
+    _checkApplicationStatus();
   }
 
   // Function to check if the user has already applied
@@ -192,9 +192,6 @@ class _ViewSupplyDetailsPageState extends State<ViewSupplyDetailsPage> {
   Future<void> _applyToSupply(BuildContext context) async {
     final userId = FirebaseAuth.instance.currentUser!.uid;
 
-    // Debug print to check the value of supply.getId
-    print('Supply ID: ${supply.getId}');
-
     // Check if supply.getId is not null before using it
     if (supply.getId != null) {
       final application = SupplyApplication(applicantId: userId, supplyId: supply.getId!, status: 'pending');
@@ -212,6 +209,7 @@ class _ViewSupplyDetailsPageState extends State<ViewSupplyDetailsPage> {
         // Update the local supply object
         setState(() {
           supply.applications = updatedSupplyObject.applications;
+          hasApplied = true; // User has applied
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -231,6 +229,7 @@ class _ViewSupplyDetailsPageState extends State<ViewSupplyDetailsPage> {
       );
     }
   }
+
   Future<void> _withdrawApplication(BuildContext context) async {
     final userId = FirebaseAuth.instance.currentUser!.uid;
 
@@ -251,6 +250,7 @@ class _ViewSupplyDetailsPageState extends State<ViewSupplyDetailsPage> {
         // Update the local supply object
         setState(() {
           supply.applications = updatedSupplyObject.applications;
+          hasApplied = false; // User has withdrawn application
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
