@@ -1,0 +1,22 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:your_app_name/ViewSuppliesPage.dart';
+
+void main() {
+  testWidgets('Renders ViewSuppliesPage widget', (WidgetTester tester) async {
+    // Build our app and trigger a frame.
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ViewSuppliesPage(),
+      ),
+    );
+
+    // You can perform widget tests based on your UI requirements
+    // For example, check if certain widgets are present
+    expect(find.text('Tedarik Listesi'), findsOneWidget);
+    expect(find.byType(ListView), findsOneWidget);
+  });
+
+  // Add more widget tests for other UI scenarios as needed
+}
